@@ -1,0 +1,38 @@
+// Cell model with visibility state
+// Author: Max Schwarz <max.schwarz@online.de>
+
+#ifndef CELL_MODEL_H
+#define CELL_MODEL_H
+
+#include <QAbstractListModel>
+
+class CellModel : public QAbstractListModel
+{
+public:
+	enum CellRoles {
+		VisibleRole = Qt::UserRole + 1,
+	};
+
+	CellModel(QObject* parent = 0);
+	virtual ~CellModel();
+
+	void setCells(int cellsX, int cellsY);
+
+	QHash<int, QByteArray> roleNames() const override;
+
+	int rowCount(const QModelIndex & parent) const override;
+	QVariant data(const QModelIndex & index, int role) const override;
+	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+
+private:
+	struct Data
+	{
+		bool visible = false;
+	};
+
+	int m_cellsX = 10;
+	int m_cellsY = 10;
+	QVector<Data> m_data;
+};
+
+#endif
