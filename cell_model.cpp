@@ -3,6 +3,9 @@
 
 #include "cell_model.h"
 
+#include <QDebug>
+#include <QSettings>
+
 CellModel::CellModel(QObject* parent)
  : QAbstractListModel{parent}
 {
@@ -14,6 +17,9 @@ CellModel::~CellModel()
 
 void CellModel::setCells(int cellsX, int cellsY)
 {
+	if(cellsX == m_cellsX && cellsY == m_cellsY)
+		return;
+
 	beginResetModel();
 	m_cellsX = cellsX;
 	m_cellsY = cellsY;
@@ -72,4 +78,46 @@ bool CellModel::setData(const QModelIndex& index, const QVariant& value, int rol
 
 	return {};
 }
+
+void CellModel::coverAll()
+{
+	for(auto& cell : m_data)
+		cell.visible = false;
+
+	dataChanged(index(0), index(m_data.size()-1));
+}
+
+void CellModel::uncoverAll()
+{
+	for(auto& cell : m_data)
+		cell.visible = true;
+
+	dataChanged(index(0), index(m_data.size()-1));
+}
+
+void CellModel::save(QSettings& settings)
+{
+	QString v;
+	for(auto& cell : m_data)
+		v += cell.visible ? '1' : '0';
+
+	settings.setValue("cells", v);
+}
+
+void CellModel::restore(const QSettings& settings)
+{
+	QString v = settings.value("cells", "").toString();
+	if(v.size() != m_data.size())
+	{
+		qDebug() << "Ignoring wrong cells (expected " << m_data.size() << ")";
+		return;
+	}
+
+	for(int i = 0; i < m_data.size(); ++i)
+	{
+		m_data[i].visible = (v[i] == '1');
+	}
+	dataChanged(index(0), index(m_data.size()-1));
+}
+
 

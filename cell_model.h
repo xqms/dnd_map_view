@@ -6,8 +6,11 @@
 
 #include <QAbstractListModel>
 
+class QSettings;
+
 class CellModel : public QAbstractListModel
 {
+Q_OBJECT
 public:
 	enum CellRoles {
 		VisibleRole = Qt::UserRole + 1,
@@ -23,6 +26,13 @@ public:
 	int rowCount(const QModelIndex & parent) const override;
 	QVariant data(const QModelIndex & index, int role) const override;
 	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+
+	void save(QSettings& settings);
+	void restore(const QSettings& settings);
+
+public Q_SLOTS:
+	void uncoverAll();
+	void coverAll();
 
 private:
 	struct Data

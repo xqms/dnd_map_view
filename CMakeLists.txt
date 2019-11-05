@@ -18,6 +18,7 @@ qt5_wrap_cpp(MOC_SRCS
 	image_view.h
 	view_controller.h
 	renderer.h
+	cell_model.h
 )
 
 add_executable(dnd_map_view

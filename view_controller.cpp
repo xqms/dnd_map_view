@@ -26,10 +26,12 @@ ViewController::ViewController(const QString& filename, QObject* parent)
 	m_cellsX = settings.value("cellsX", m_cellsX).toUInt();
 	m_cellsY = settings.value("cellsY", m_cellsY).toUInt();
 
-	m_cellModel.setCells(m_cellsX, m_cellsY);
 	connect(this, &ViewController::cellsChanged, [&](){
 		m_cellModel.setCells(m_cellsX, m_cellsY);
 	});
+
+	m_cellModel.setCells(m_cellsX, m_cellsY);
+	m_cellModel.restore(settings);
 
 	connect(m_renderer.get(), &Renderer::renderFinished, this, &ViewController::setImage);
 
@@ -47,6 +49,7 @@ ViewController::~ViewController()
 	settings.setValue("cellsRect", m_cellsRect);
 	settings.setValue("cellsX", m_cellsX);
 	settings.setValue("cellsY", m_cellsY);
+	m_cellModel.save(settings);
 }
 
 void ViewController::setRectPos(const QPointF& pos)
@@ -88,7 +91,6 @@ void ViewController::setPresenterResolution(int res)
 
 void ViewController::render()
 {
-	qDebug() << "RENDER";
 	m_renderer->render(std::max(m_presenterResolution, m_consoleResolution));
 }
 
