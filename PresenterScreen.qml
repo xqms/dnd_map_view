@@ -1,6 +1,7 @@
 
 import QtQuick 2.0
 import presenter 1.0
+import QtMultimedia 5.8
 
 Rectangle {
 	id: "container"
@@ -23,19 +24,19 @@ Rectangle {
 
 		// The image itself
 		Item {
+			id: imageItem
 			anchors.fill: parent
 			transform: [
 				Scale {
-					xScale: 1.0 / Math.max(imageView.imageWidth, imageView.imageHeight)
-					yScale: 1.0 / Math.max(imageView.imageWidth, imageView.imageHeight)
+					xScale: 1.0 / Math.max(mediaItem.mediaWidth, mediaItem.mediaHeight)
+					yScale: 1.0 / Math.max(mediaItem.mediaWidth, mediaItem.mediaHeight)
 				}
 			]
 
-			ImageView {
-				id: imageView
-				image: controller.image
-				width: imageWidth
-				height: imageHeight
+			MediaItem {
+				id: mediaItem
+				width: mediaWidth
+				height: mediaHeight
 			}
 		}
 

@@ -7,15 +7,34 @@
 #include "renderers/image_renderer.h"
 
 #include <QDebug>
+#include <QMimeDatabase>
 #include <QSettings>
 
 ViewController::ViewController(const QString& filename, QObject* parent)
  : QObject{parent}
 {
-	if(filename.toLower().endsWith(".pdf"))
+	QMimeDatabase db;
+	auto type = db.mimeTypeForFile(filename);
+	if(!type.isValid())
+	{
+		fprintf(stderr, "Could not determine MIME type of file '%s'\n",
+			qPrintable(filename)
+		);
+
+		throw std::runtime_error("Could not determine MIME type");
+	}
+
+	if(type.name().startsWith("video/"))
+		m_video = "file://" + filename;
+	else if(type.inherits("application/pdf"))
 		m_renderer.reset(new PDFRenderer(filename));
-	else
+	else if(type.name().startsWith("image/"))
 		m_renderer.reset(new ImageRenderer(filename));
+	else
+	{
+		fprintf(stderr, "Unknown MIME type: %s\n", qPrintable(type.name()));
+		throw std::runtime_error("Could not determine MIME type");
+	}
 
 	m_settingsPath = filename + ".dnd";
 
@@ -33,12 +52,15 @@ ViewController::ViewController(const QString& filename, QObject* parent)
 	m_cellModel.setCells(m_cellsX, m_cellsY);
 	m_cellModel.restore(settings);
 
-	connect(m_renderer.get(), &Renderer::renderFinished, this, &ViewController::setImage);
+	if(m_renderer)
+	{
+		connect(m_renderer.get(), &Renderer::renderFinished, this, &ViewController::setImage);
 
-	m_renderTimer.setSingleShot(true);
-	m_renderTimer.setInterval(500);
-	connect(&m_renderTimer, &QTimer::timeout, this, &ViewController::render);
-	render();
+		m_renderTimer.setSingleShot(true);
+		m_renderTimer.setInterval(500);
+		connect(&m_renderTimer, &QTimer::timeout, this, &ViewController::render);
+		render();
+	}
 }
 
 ViewController::~ViewController()
@@ -79,19 +101,24 @@ void ViewController::setConsoleResolution(int res)
 {
 	m_consoleResolution = res;
 	resolutionsChanged();
-	m_renderTimer.start();
+
+	if(m_renderer)
+		m_renderTimer.start();
 }
 
 void ViewController::setPresenterResolution(int res)
 {
 	m_presenterResolution = res;
 	resolutionsChanged();
-	m_renderTimer.start();
+
+	if(m_renderer)
+		m_renderTimer.start();
 }
 
 void ViewController::render()
 {
-	m_renderer->render(std::max(m_presenterResolution, m_consoleResolution));
+	if(m_renderer)
+		m_renderer->render(std::max(m_presenterResolution, m_consoleResolution));
 }
 
 void ViewController::setImage(const QImage& img)

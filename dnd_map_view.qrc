@@ -2,5 +2,6 @@
 <qresource>
 	<file>ConsoleScreen.qml</file>
 	<file>PresenterScreen.qml</file>
+	<file>MediaItem.qml</file>
 </qresource>
 </RCC>

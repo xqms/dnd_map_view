@@ -67,7 +67,7 @@ Rectangle {
 		}
 	}
 
-	property real imgScale: Math.max(imageView.imageRect.width, imageView.imageRect.height)
+	property real imgScale: Math.max(imageView.mediaRect.width, imageView.mediaRect.height)
 
 	Item {
 		id: imageFlick
@@ -114,19 +114,18 @@ Rectangle {
 			}
 		}
 
-		ImageView {
+		MediaItem {
 			id: imageView
 			width: imageFlick.zoom * imageFlick.width
 			height: imageFlick.zoom * imageFlick.height
-			image: controller.image
 
 			Item {
 				id: imageSpace
-				x: imageView.imageRect.x
-				y: imageView.imageRect.y
-				width: imageView.imageWidth / Math.max(imageView.imageWidth, imageView.imageHeight)
-				height: imageView.imageHeight / Math.max(imageView.imageWidth, imageView.imageHeight)
-				scale: imageView.imageRect.width / width
+				x: imageView.mediaRect.x
+				y: imageView.mediaRect.y
+				width: imageView.mediaWidth / Math.max(imageView.mediaWidth, imageView.mediaHeight)
+				height: imageView.mediaHeight / Math.max(imageView.mediaWidth, imageView.mediaHeight)
+				scale: imageView.mediaRect.width / width
 				transformOrigin: Item.TopLeft
 
 				// Cells
@@ -178,7 +177,7 @@ Rectangle {
 							function mark(value) {
 								cellVisible = value;
 							}
-							property bool cellVisibleRead: cellVisible;
+							property bool cellVisibleRead: (typeof cellVisible !== 'undefined') ? cellVisible : false;
 
 							color: {
 								if(phase_visibility.checked)

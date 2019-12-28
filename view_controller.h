@@ -18,6 +18,7 @@ class ViewController : public QObject
 {
 Q_OBJECT
 Q_PROPERTY(QImage image WRITE setImage READ image NOTIFY imageChanged)
+Q_PROPERTY(QString videoURL READ videoURL CONSTANT)
 
 Q_PROPERTY(int presenterWidth READ presenterWidth WRITE setPresenterWidth NOTIFY presenterGeometryChanged)
 Q_PROPERTY(int presenterHeight READ presenterHeight WRITE setPresenterHeight NOTIFY presenterGeometryChanged)
@@ -43,6 +44,9 @@ public:
 	{ return m_image; }
 
 	void setImage(const QImage& img);
+
+	const QString& videoURL() const
+	{ return m_video; }
 
 	constexpr int presenterWidth() const
 	{ return m_presenterWidth; }
@@ -129,6 +133,8 @@ private:
 	QString m_settingsPath;
 
 	CellModel m_cellModel;
+
+	QString m_video;
 };
 
 #endif
