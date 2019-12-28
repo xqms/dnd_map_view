@@ -14,6 +14,8 @@ include_directories(${POPPLER_INCLUDE_DIRS})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fopenmp")
 
+add_definitions(-DDND_MAP_VIEW_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+
 qt5_wrap_cpp(MOC_SRCS
 	image_view.h
 	view_controller.h
@@ -21,8 +23,13 @@ qt5_wrap_cpp(MOC_SRCS
 	cell_model.h
 )
 
+qt5_add_resources(RCC_SRCS
+	dnd_map_view.qrc
+)
+
 add_executable(dnd_map_view
 	${MOC_SRCS}
+	${RCC_SRCS}
 	dnd_map_view.cpp
 	image_view.cpp
 	view_controller.cpp
@@ -37,3 +44,6 @@ target_link_libraries(dnd_map_view
 	${POPPLER_LIBRARIES}
 )
 
+install(TARGETS dnd_map_view
+	RUNTIME DESTINATION bin
+)

@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 	presenterView.setTitle("D&D Map View - Presenter");
 	presenterView.showFullScreen();
 	presenterView.engine()->rootContext()->setContextProperty("controller", &controller);
-	presenterView.setSource(QUrl("../PresenterScreen.qml"));
+	presenterView.setSource(QUrl("qrc:/PresenterScreen.qml"));
 
 	QObject::connect(&presenterView, &QQuickView::widthChanged, &controller, &ViewController::setPresenterWidth);
 	QObject::connect(&presenterView, &QQuickView::heightChanged, &controller, &ViewController::setPresenterHeight);
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 	consoleView.setScreen(consoleScreen);
 
 	consoleView.engine()->rootContext()->setContextProperty("controller", &controller);
-	consoleView.setSource(QUrl("../ConsoleScreen.qml"));
+	consoleView.setSource(QUrl("qrc:/ConsoleScreen.qml"));
 
 	auto screenGeom = consoleScreen->geometry();
 	qDebug() << "Console screen geometry: " << screenGeom;
