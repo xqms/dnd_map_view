@@ -13,6 +13,8 @@ Item {
 	property real scaledHeight: mediaHeight * scale
 	property variant mediaRect: Qt.rect((width - scaledWidth)/2, (height-scaledHeight)/2, scaledWidth, scaledHeight)
 
+	property bool muted: false
+
 	Item {
 		id: contentContainer
 		x: mediaItem.mediaRect.x
@@ -32,6 +34,7 @@ Item {
 			source: controller.videoURL
 			loops: MediaPlayer.Infinite
 			autoPlay: true
+			muted: mediaItem.muted
 
 			onError: function(error, errorString){
 				console.log("playback error:", error, errorString);

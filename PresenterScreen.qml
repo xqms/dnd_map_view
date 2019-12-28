@@ -37,6 +37,7 @@ Rectangle {
 				id: mediaItem
 				width: mediaWidth
 				height: mediaHeight
+				muted: true
 			}
 		}
 
