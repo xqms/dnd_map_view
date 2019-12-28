@@ -111,5 +111,8 @@ int main(int argc, char** argv)
 
 	QObject::connect(&consoleView, SIGNAL(closing(QQuickCloseEvent*)), &app, SLOT(quit()));
 
+	QObject::connect(presenterView.engine(), &QQmlEngine::quit, &app, &QApplication::quit);
+	QObject::connect(consoleView.engine(), &QQmlEngine::quit, &app, &QApplication::quit);
+
 	return app.exec();
 }
