@@ -9,6 +9,7 @@
 CellModel::CellModel(QObject* parent)
  : QAbstractListModel{parent}
 {
+	setCells(10, 10);
 }
 
 CellModel::~CellModel()

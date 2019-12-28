@@ -40,8 +40,8 @@ private:
 		bool visible = false;
 	};
 
-	int m_cellsX = 10;
-	int m_cellsY = 10;
+	int m_cellsX = 0;
+	int m_cellsY = 0;
 	QVector<Data> m_data;
 };
 
