@@ -9,6 +9,7 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQuickStyle>
+#include <QDir>
 
 #include <iostream>
 #include <memory>
@@ -37,6 +38,7 @@ int main(int argc, char** argv)
 	}
 
 	QString file = app.arguments().at(1);
+	file = QDir(file).absolutePath();
 	qDebug() << "Opening" << file;
 
 	using ScoredScreen = std::pair<QScreen*, int>;
