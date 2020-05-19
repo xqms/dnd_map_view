@@ -33,6 +33,7 @@ Q_PROPERTY(int presenterResolution READ presenterResolution WRITE setPresenterRe
 Q_PROPERTY(QRectF cellsRect READ cellsRect WRITE setCellsRect NOTIFY cellsRectChanged)
 Q_PROPERTY(int cellsX READ cellsX WRITE setCellsX NOTIFY cellsChanged)
 Q_PROPERTY(int cellsY READ cellsY WRITE setCellsY NOTIFY cellsChanged)
+Q_PROPERTY(bool displayGrid READ displayGrid WRITE setDisplayGrid NOTIFY displayGridChanged)
 
 Q_PROPERTY(QObject* cellModel READ cellModel CONSTANT)
 
@@ -78,6 +79,9 @@ public:
 	constexpr int cellsY() const
 	{ return m_cellsY; }
 
+	constexpr bool displayGrid() const
+	{ return m_displayGrid; }
+
 	QObject* cellModel()
 	{
 		return &m_cellModel;
@@ -96,6 +100,7 @@ public Q_SLOTS:
 	void setCellsRect(const QRectF& rect);
 	void setCellsX(int cells);
 	void setCellsY(int cells);
+	void setDisplayGrid(bool display);
 
 Q_SIGNALS:
 	void imageChanged();
@@ -108,6 +113,7 @@ Q_SIGNALS:
 
 	void cellsChanged();
 	void cellsRectChanged();
+	void displayGridChanged();
 
 private Q_SLOTS:
 	void render();
@@ -129,6 +135,7 @@ private:
 	QRectF m_cellsRect{0.2, 0.2, 0.7, 0.7};
 	int m_cellsX = 10;
 	int m_cellsY = 10;
+	bool m_displayGrid = false;
 
 	QString m_settingsPath;
 

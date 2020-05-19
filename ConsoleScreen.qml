@@ -53,6 +53,17 @@ Rectangle {
 			}
 		}
 
+		CheckBox {
+			text: "Display Grid"
+			Component.onCompleted: {
+				// Load saved values
+				checked = controller.displayGrid;
+
+				// From now on, we are driving!
+				controller.displayGrid = Qt.binding(function() { return checked });
+			}
+		}
+
 		Item {
 			Layout.fillWidth: true
 		}

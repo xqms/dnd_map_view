@@ -44,6 +44,7 @@ ViewController::ViewController(const QString& filename, QObject* parent)
 	m_cellsRect = settings.value("cellsRect", m_cellsRect).toRectF();
 	m_cellsX = settings.value("cellsX", m_cellsX).toUInt();
 	m_cellsY = settings.value("cellsY", m_cellsY).toUInt();
+	m_displayGrid = settings.value("displayGrid", m_displayGrid).toBool();
 
 	connect(this, &ViewController::cellsChanged, [&](){
 		m_cellModel.setCells(m_cellsX, m_cellsY);
@@ -71,6 +72,7 @@ ViewController::~ViewController()
 	settings.setValue("cellsRect", m_cellsRect);
 	settings.setValue("cellsX", m_cellsX);
 	settings.setValue("cellsY", m_cellsY);
+	settings.setValue("displayGrid", m_displayGrid);
 	m_cellModel.save(settings);
 }
 
@@ -132,6 +134,13 @@ void ViewController::setCellsRect(const QRectF& rect)
 	m_cellsRect = rect;
 	cellsRectChanged();
 }
+
+void ViewController::setDisplayGrid(bool display)
+{
+	m_displayGrid = display;
+	displayGridChanged();
+}
+
 
 void ViewController::setCellsX(int cells)
 {
