@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QMimeDatabase>
 #include <QSettings>
+#include <QStandardPaths>
 
 ViewController::ViewController(const QString& filename, QObject* parent)
  : QObject{parent}
@@ -38,20 +39,25 @@ ViewController::ViewController(const QString& filename, QObject* parent)
 
 	m_settingsPath = filename + ".dnd";
 
-	QSettings settings(m_settingsPath, QSettings::IniFormat);
-	m_rectPos = settings.value("rectPos", m_rectPos).toPointF();
-	m_rectWidth = settings.value("rectWidth", m_rectWidth).toDouble();
-	m_cellsRect = settings.value("cellsRect", m_cellsRect).toRectF();
-	m_cellsX = settings.value("cellsX", m_cellsX).toUInt();
-	m_cellsY = settings.value("cellsY", m_cellsY).toUInt();
-	m_displayGrid = settings.value("displayGrid", m_displayGrid).toBool();
+	auto global_settings_location = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+	if(!global_settings_location.isEmpty()) {
+		QSettings global_settings(global_settings_location + "/settings.ini", QSettings::IniFormat);
+		m_cellsPerPresenterRow = global_settings.value("cellsPerPresenterRow", m_cellsPerPresenterRow).toDouble();
+	}
+
+	QSettings local_settings(m_settingsPath, QSettings::IniFormat);
+	m_rectPos = local_settings.value("rectPos", m_rectPos).toPointF();
+	m_cellsRect = local_settings.value("cellsRect", m_cellsRect).toRectF();
+	m_cellsX = local_settings.value("cellsX", m_cellsX).toUInt();
+	m_cellsY = local_settings.value("cellsY", m_cellsY).toUInt();
+	m_displayGrid = local_settings.value("displayGrid", m_displayGrid).toBool();
 
 	connect(this, &ViewController::cellsChanged, [&](){
 		m_cellModel.setCells(m_cellsX, m_cellsY);
 	});
 
 	m_cellModel.setCells(m_cellsX, m_cellsY);
-	m_cellModel.restore(settings);
+	m_cellModel.restore(local_settings);
 
 	if(m_renderer)
 	{
@@ -66,14 +72,20 @@ ViewController::ViewController(const QString& filename, QObject* parent)
 
 ViewController::~ViewController()
 {
-	QSettings settings(m_settingsPath, QSettings::IniFormat);
-	settings.setValue("rectPos", m_rectPos);
-	settings.setValue("rectWidth", m_rectWidth);
-	settings.setValue("cellsRect", m_cellsRect);
-	settings.setValue("cellsX", m_cellsX);
-	settings.setValue("cellsY", m_cellsY);
-	settings.setValue("displayGrid", m_displayGrid);
-	m_cellModel.save(settings);
+	auto global_settings_location = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+	if(!global_settings_location.isEmpty()) {
+		QSettings global_settings(global_settings_location + "/settings.ini", QSettings::IniFormat);
+		global_settings.setValue("cellsPerPresenterRow", m_cellsPerPresenterRow);
+	}
+
+	QSettings local_settings(m_settingsPath, QSettings::IniFormat);
+	local_settings.setValue("rectPos", m_rectPos);
+	local_settings.setValue("cellsRect", m_cellsRect);
+	local_settings.setValue("cellsX", m_cellsX);
+	local_settings.setValue("cellsY", m_cellsY);
+	local_settings.setValue("displayGrid", m_displayGrid);
+	local_settings.setValue("cellsPerPresenterRow", m_cellsPerPresenterRow);
+	m_cellModel.save(local_settings);
 }
 
 void ViewController::setRectPos(const QPointF& pos)
