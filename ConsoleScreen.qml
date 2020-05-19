@@ -426,6 +426,9 @@ Rectangle {
 					width: 0.5
 					height: width / controller.presenterAspectRatio
 
+					property real cellSize: controller.cellsRect.width / controller.cellsX
+					property real cellsPerPresenterRow
+
 					x: 0.1
 					y: 0.1
 
@@ -433,11 +436,15 @@ Rectangle {
 						// Load saved values
 						x = controller.rectPos.x;
 						y = controller.rectPos.y;
-						width = controller.rectWidth;
+						cellsPerPresenterRow = controller.cellsPerPresenterRow;
+						width = cellSize * cellsPerPresenterRow;
 
 						// From now on, we are driving!
+						controller.cellsPerPresenterRow = Qt.binding(function() { return presenterRect.cellsPerPresenterRow; });
 						controller.rectPos = Qt.binding(function(){ return Qt.point(presenterRect.x, presenterRect.y) });
-						controller.rectWidth = Qt.binding(function(){ return presenterRect.width; });
+						controller.rectWidth = Qt.binding(function(){
+							return presenterRect.cellSize * cellsPerPresenterRow;
+						});
 					}
 
 					Rectangle
@@ -510,6 +517,7 @@ Rectangle {
 
 								var widthChange = pos.x - startPos.x;
 								presenterRect.width = startWidth + widthChange;
+								presenterRect.cellsPerPresenterRow = presenterRect.width / presenterRect.cellSize;
 							}
 						}
 					}

@@ -26,6 +26,7 @@ Q_PROPERTY(double presenterAspectRatio READ presenterAspectRatio NOTIFY presente
 
 Q_PROPERTY(QPointF rectPos READ rectPos WRITE setRectPos NOTIFY rectChanged)
 Q_PROPERTY(double rectWidth READ rectWidth WRITE setRectWidth NOTIFY rectWidthChanged)
+Q_PROPERTY(double cellsPerPresenterRow READ cellsPerPresenterRow WRITE setCellsPerPresenterRow NOTIFY cellsPerPresenterRowChanged)
 
 Q_PROPERTY(int consoleResolution READ consoleResolution WRITE setConsoleResolution NOTIFY resolutionsChanged)
 Q_PROPERTY(int presenterResolution READ presenterResolution WRITE setPresenterResolution NOTIFY resolutionsChanged)
@@ -64,6 +65,9 @@ public:
 	double rectWidth() const
 	{ return m_rectWidth; }
 
+	double cellsPerPresenterRow() const
+	{ return m_cellsPerPresenterRow; }
+
 	constexpr int consoleResolution() const
 	{ return m_consoleResolution; }
 
@@ -93,6 +97,7 @@ public Q_SLOTS:
 
 	void setRectPos(const QPointF& pos);
 	void setRectWidth(double width);
+	void setCellsPerPresenterRow(double cells);
 
 	void setPresenterResolution(int res);
 	void setConsoleResolution(int res);
@@ -108,6 +113,7 @@ Q_SIGNALS:
 
 	void rectChanged();
 	void rectWidthChanged();
+	void cellsPerPresenterRowChanged();
 
 	void resolutionsChanged();
 
@@ -127,6 +133,7 @@ private:
 
 	QPointF m_rectPos{0.1, 0.1};
 	double m_rectWidth = 0.5;
+	double m_cellsPerPresenterRow = 19.0;
 
 	QTimer m_renderTimer;
 	int m_presenterResolution = 800;

@@ -87,6 +87,12 @@ void ViewController::setRectWidth(double width)
 	rectWidthChanged();
 }
 
+void ViewController::setCellsPerPresenterRow(double cells)
+{
+	m_cellsPerPresenterRow = cells;
+	cellsPerPresenterRowChanged();
+}
+
 
 void ViewController::setPresenterWidth(int width)
 {
