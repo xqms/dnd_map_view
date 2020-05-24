@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QMimeDatabase>
 #include <QSettings>
+#include <QStandardPaths>
 
 ViewController::ViewController(const QString& filename, QObject* parent)
  : QObject{parent}
@@ -36,21 +37,24 @@ ViewController::ViewController(const QString& filename, QObject* parent)
 		throw std::runtime_error("Could not determine MIME type");
 	}
 
+	QSettings globalSettings("xqms", "dnd_map_view");
+	m_cellsPerPresenterRow = globalSettings.value("cellsPerPresenterRow", m_cellsPerPresenterRow).toDouble();
+
 	m_settingsPath = filename + ".dnd";
 
-	QSettings settings(m_settingsPath, QSettings::IniFormat);
-	m_rectPos = settings.value("rectPos", m_rectPos).toPointF();
-	m_rectWidth = settings.value("rectWidth", m_rectWidth).toDouble();
-	m_cellsRect = settings.value("cellsRect", m_cellsRect).toRectF();
-	m_cellsX = settings.value("cellsX", m_cellsX).toUInt();
-	m_cellsY = settings.value("cellsY", m_cellsY).toUInt();
+	QSettings localSettings(m_settingsPath, QSettings::IniFormat);
+	m_rectPos = localSettings.value("rectPos", m_rectPos).toPointF();
+	m_cellsRect = localSettings.value("cellsRect", m_cellsRect).toRectF();
+	m_cellsX = localSettings.value("cellsX", m_cellsX).toUInt();
+	m_cellsY = localSettings.value("cellsY", m_cellsY).toUInt();
+	m_displayGrid = localSettings.value("displayGrid", m_displayGrid).toBool();
 
 	connect(this, &ViewController::cellsChanged, [&](){
 		m_cellModel.setCells(m_cellsX, m_cellsY);
 	});
 
 	m_cellModel.setCells(m_cellsX, m_cellsY);
-	m_cellModel.restore(settings);
+	m_cellModel.restore(localSettings);
 
 	if(m_renderer)
 	{
@@ -65,13 +69,17 @@ ViewController::ViewController(const QString& filename, QObject* parent)
 
 ViewController::~ViewController()
 {
-	QSettings settings(m_settingsPath, QSettings::IniFormat);
-	settings.setValue("rectPos", m_rectPos);
-	settings.setValue("rectWidth", m_rectWidth);
-	settings.setValue("cellsRect", m_cellsRect);
-	settings.setValue("cellsX", m_cellsX);
-	settings.setValue("cellsY", m_cellsY);
-	m_cellModel.save(settings);
+	QSettings globalSettings("xqms", "dnd_map_view");
+	globalSettings.setValue("cellsPerPresenterRow", m_cellsPerPresenterRow);
+
+	QSettings localSettings(m_settingsPath, QSettings::IniFormat);
+	localSettings.setValue("rectPos", m_rectPos);
+	localSettings.setValue("cellsRect", m_cellsRect);
+	localSettings.setValue("cellsX", m_cellsX);
+	localSettings.setValue("cellsY", m_cellsY);
+	localSettings.setValue("displayGrid", m_displayGrid);
+	localSettings.setValue("cellsPerPresenterRow", m_cellsPerPresenterRow);
+	m_cellModel.save(localSettings);
 }
 
 void ViewController::setRectPos(const QPointF& pos)
@@ -83,6 +91,12 @@ void ViewController::setRectWidth(double width)
 {
 	m_rectWidth = width;
 	rectWidthChanged();
+}
+
+void ViewController::setCellsPerPresenterRow(double cells)
+{
+	m_cellsPerPresenterRow = cells;
+	cellsPerPresenterRowChanged();
 }
 
 
@@ -132,6 +146,13 @@ void ViewController::setCellsRect(const QRectF& rect)
 	m_cellsRect = rect;
 	cellsRectChanged();
 }
+
+void ViewController::setDisplayGrid(bool display)
+{
+	m_displayGrid = display;
+	displayGridChanged();
+}
+
 
 void ViewController::setCellsX(int cells)
 {
