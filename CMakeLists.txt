@@ -2,14 +2,15 @@
 cmake_minimum_required(VERSION 3.0)
 project(dnd_map_view)
 
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Quick REQUIRED)
-find_package(Qt5QuickControls2 REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Widgets Quick QuickControls2)
 
 find_path(POPPLER_INCLUDE_DIRS poppler-qt5.h HINTS /usr/include/poppler/qt5)
 find_library(POPPLER_LIBRARIES poppler-qt5)
 
-include_directories(${POPPLER_INCLUDE_DIRS})
+if(POPPLER_LIBRARIES)
+	add_definitions(-DHAVE_POPPLER=1)
+	include_directories(${POPPLER_INCLUDE_DIRS})
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fopenmp")
@@ -41,8 +42,12 @@ target_link_libraries(dnd_map_view
 	Qt5::Widgets
 	Qt5::Quick
 	Qt5::QuickControls2
-	${POPPLER_LIBRARIES}
 )
+if(POPPLER_LIBRARIES)
+	target_link_libraries(dnd_map_view
+		${POPPLER_LIBRARIES}
+	)
+endif()
 
 install(TARGETS dnd_map_view
 	RUNTIME DESTINATION bin
