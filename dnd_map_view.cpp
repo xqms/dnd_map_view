@@ -74,15 +74,12 @@ int main(int argc, char** argv)
 	}
 
 	QScreen* presentationScreen = scoredScreens.back().first;
-	QScreen* consoleScreen = scoredScreens.front().first;
 
 	ViewController controller{file};
 
 	qmlRegisterType<ImageView>("presenter", 1, 0, "ImageView");
 
 	QQuickView presenterView;
-	presenterView.setScreen(presentationScreen);
-	presenterView.setGeometry(presentationScreen->geometry());
 	presenterView.setTitle("D&D Map View - Presenter");
 	presenterView.show();
 	presenterView.engine()->rootContext()->setContextProperty("controller", &controller);
@@ -94,20 +91,9 @@ int main(int argc, char** argv)
 	controller.setPresenterHeight(presentationScreen->geometry().height());
 
 	QQuickView consoleView;
-	consoleView.setScreen(consoleScreen);
 
 	consoleView.engine()->rootContext()->setContextProperty("controller", &controller);
 	consoleView.setSource(QUrl("qrc:/ConsoleScreen.qml"));
-
-	auto screenGeom = consoleScreen->geometry();
-	qDebug() << "Console screen geometry: " << screenGeom;
-	QSize size(800, 600);
-	QRect geometry(
-		screenGeom.center() - QPoint(size.width()/2, size.height()/2),
-		size
-	);
-	qDebug() << "Console window: " << geometry;
-	consoleView.setGeometry(geometry);
 	consoleView.setTitle("D&D Map View - Console");
 	consoleView.show();
 
