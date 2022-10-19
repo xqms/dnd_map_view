@@ -3,7 +3,9 @@
 
 #include "pdf_renderer.h"
 
+#if HAVE_POPPLER
 #include <poppler-qt5.h>
+#endif
 
 #include <QDebug>
 #include <QThreadPool>
@@ -13,8 +15,10 @@
 class PDFRenderer::Private
 {
 public:
+#if HAVE_POPPLER
 	std::shared_ptr<Poppler::Document> document;
 	Poppler::Page* page{};
+#endif
 
 	QThreadPool pool;
 	QFuture<void> future;
@@ -23,6 +27,7 @@ public:
 PDFRenderer::PDFRenderer(const QString& filename)
  : m_d{new Private}
 {
+#if HAVE_POPPLER
 	m_d->document.reset(
 		Poppler::Document::load(filename)
 	);
@@ -38,6 +43,9 @@ PDFRenderer::PDFRenderer(const QString& filename)
 	m_d->page = m_d->document->page(0);
 	if(!m_d->page)
 		throw std::runtime_error("PDF is empty");
+#else
+	throw std::runtime_error{"No PDF support"};
+#endif
 }
 
 PDFRenderer::~PDFRenderer()
@@ -46,11 +54,14 @@ PDFRenderer::~PDFRenderer()
 
 void PDFRenderer::render(int size)
 {
+#if HAVE_POPPLER
 	m_d->future = QtConcurrent::run(&m_d->pool, this, &PDFRenderer::doRender, size);
+#endif
 }
 
 void PDFRenderer::doRender(int size)
 {
+#if HAVE_POPPLER
 	// Don't do something stupid
 	if(size > 10000)
 	{
@@ -66,6 +77,7 @@ void PDFRenderer::doRender(int size)
 		throw std::runtime_error("Could not render image");
 
 	renderFinished(image);
+#endif
 }
 
 

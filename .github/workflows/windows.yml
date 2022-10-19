@@ -1,0 +1,58 @@
+name: windows
+on: [push]
+
+env:
+  QT_VERSION: "5.15.2"
+  MINGW_VERSION: "win64_mingw81"
+  MINGW_PATH: "mingw81_64"
+  BUILD_TYPE: "Release"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        #      - name: Install Poppler
+        #uses: crazy-max/ghaction-chocolatey@v1
+        #with:
+        #  args: "install poppler -y"
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          host: windows
+          target: "desktop"
+          version: ${{ env.QT_VERSION }}
+          arch: ${{ env.MINGW_VERSION }}
+          dir: "${{github.workspace}}/qt"
+          install-deps: "true"
+          #      - name: Set Qt path and refresh
+          #run: |
+          #echo "${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/${{ env.MINGW_PATH }}/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          #refreshenv
+      - name: Configure CMake
+        working-directory: ${{github.workspace}}
+        env:
+          CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
+        run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -G "CodeBlocks - MinGW Makefiles" -B ${{github.workspace}}/build
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        run: mingw32-make.exe
+      - name: Compress portable program
+        run: |
+          mkdir ${{github.workspace}}\build\all\
+          cp ${{github.workspace}}/build/dnd_map_view.exe ${{github.workspace}}\build\all\
+          cp ${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/${{ env.MINGW_PATH }}/bin/libgcc_s_seh-1.dll ${{github.workspace}}\build\all\
+          cp ${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/${{ env.MINGW_PATH }}/bin/libstdc++-6.dll ${{github.workspace}}\build\all\
+          cp ${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/${{ env.MINGW_PATH }}/bin/libwinpthread-1.dll ${{github.workspace}}\build\all\
+          cd ${{github.workspace}}\build\all\
+          windeployqt.exe --compiler-runtime --qmldir ${{github.workspace}} dnd_map_view.exe
+          ls
+          ls "${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/${{ env.MINGW_PATH }}/bin"
+          ls "C:\\"
+          Compress-Archive -Path ${{github.workspace}}\build\all\ -DestinationPath ${{github.workspace}}\build\final.zip
+      - name: Collect artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Release
+          path: ${{github.workspace}}/build/final.zip
+
