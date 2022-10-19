@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 	presenterView.setScreen(presentationScreen);
 	presenterView.setGeometry(presentationScreen->geometry());
 	presenterView.setTitle("D&D Map View - Presenter");
-	presenterView.showFullScreen();
+	presenterView.show();
 	presenterView.engine()->rootContext()->setContextProperty("controller", &controller);
 	presenterView.setSource(QUrl("qrc:/PresenterScreen.qml"));
 
